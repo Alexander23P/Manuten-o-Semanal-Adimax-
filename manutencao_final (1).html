@@ -223,6 +223,22 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
           </div>
         </div>
 
+        <!-- ALERTA SEM APONTAMENTO -->
+        <div id="alert-sem-apt" style="display:none;margin-top:8px">
+          <div class="alert-card" style="background:var(--ye-bg);border-color:rgba(245,158,11,.3);cursor:pointer"
+               onclick="goSc('op',document.querySelector('.bi[data-s=op]'));setTimeout(()=>{document.querySelector('.fc[data-f=todos]')?.click()},100)">
+            <div>📋</div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--ye)">OMs sem Apontamento!</div>
+              <div id="alert-sem-apt-txt" style="font-size:11px;color:var(--tx3);margin-top:2px"></div>
+            </div>
+            <div style="margin-left:auto">
+              <div id="alert-sem-apt-n" style="font-size:24px;font-weight:800;color:var(--ye)">0</div>
+              <div style="font-size:9px;color:var(--ye)">OMs</div>
+            </div>
+          </div>
+        </div>
+
         <div class="sg3 g">
           <div class="sc2 ca"><div class="sn" id="d-tot">0</div><div class="sl">Total Semana</div></div>
           <div class="sc2 cg"><div class="sn" id="d-exec">0</div><div class="sl">Realizadas</div></div>
@@ -255,7 +271,6 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
         <div class="fc on" data-f="todos" onclick="setF(this)">🔴 Pendentes</div>
         <div class="fc" data-f="atrasada" onclick="setF(this)">⚠️ Em Atraso</div>
         <div class="fc" data-f="todos_ver" onclick="setF(this)">Ver Todas</div>
-        <div class="fc" data-f="cumpriu" onclick="setF(this)">✅ Cumpridas</div>
         <div class="fc" data-f="nao_cumpriu" onclick="setF(this)">❌ Não Cumpridas</div>
         <div class="fc" data-f="atraso" onclick="setF(this)">⏱ C/ Atraso</div>
         <div class="fc" data-f="reprogramada" onclick="setF(this)">📅 Reprog.</div>
@@ -336,13 +351,11 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     <div class="fi">
       <label>Situação do Dia *</label>
       <div class="sb2">
-        <button class="sbx" data-v="cumpriu" onclick="selSt(this)">✅ Cumpriu no Dia</button>
         <button class="sbx" data-v="nao_cumpriu" onclick="selSt(this)">❌ Não Cumpriu</button>
-      </div>
-      <div class="sb3">
         <button class="sbx" data-v="atraso" onclick="selSt(this)">⚠️ Com Atraso</button>
-        <button class="sbx" data-v="reprogramada" onclick="selSt(this)">📅 Reprog.</button>
-        <button class="sbx" data-v="andamento" onclick="selSt(this)">🔄 Andamento</button>
+      </div>
+      <div style="margin-top:7px">
+        <button class="sbx" style="width:100%" data-v="reprogramada" onclick="selSt(this)">📅 Reprogramada</button>
       </div>
     </div>
     <div id="mot-w" style="display:none">
@@ -647,7 +660,17 @@ function stats(){
   // Durante a semana: (real/esp)*100, limitado a 100
   const tend=esp>=100 ? real : (esp>0?Math.min(100,Math.round((real/esp)*100)):0);
 
-  return{tot,pz,at,nc,rp,an,pd,real,esp,tend,cmsExec,cmsFech,cmsConc,totalProg,realizadas};
+  // OMs vencidas SEM apontamento do supervisor
+  const semApt = getCMS().filter(c=>{
+    const sc=(c.status||'').toLowerCase();
+    const prog=sc.includes('programada')||sc===''||sc==='programadas';
+    if(!prog) return false;
+    if(foiRealizada(c.om)) return false;
+    if(ultApt(c.om)) return false; // já tem apontamento
+    return estaAtrasada(c.om); // só se estiver vencida
+  }).length;
+
+  return{tot,pz,at,nc,rp,an,pd,real,esp,tend,cmsExec,cmsFech,cmsConc,totalProg,realizadas,semApt};
 }
 function motivos(){const c={};DB.apts.filter(a=>a.semana===S.semana&&(a.motivo||a.motivo_outro)).forEach(a=>{const m=a.motivo_outro||a.motivo||'';if(m)c[m]=(c[m]||0)+1;});return Object.entries(c).sort((a,b)=>b[1]-a[1]);}
 
@@ -783,6 +806,20 @@ function renderDash(){
       if (alertTxt) alertTxt.textContent = atrasadas.length + ' OM(s) com data de programação vencida';
     } else {
       alertEl.style.display = 'none';
+    }
+  }
+
+  // Alerta de OMs programadas sem apontamento
+  const alertSemApt = document.getElementById('alert-sem-apt');
+  const alertSemAptN = document.getElementById('alert-sem-apt-n');
+  const alertSemAptTxt = document.getElementById('alert-sem-apt-txt');
+  if (alertSemApt) {
+    if (st.semApt > 0) {
+      alertSemApt.style.display = 'block';
+      if (alertSemAptN) alertSemAptN.textContent = st.semApt;
+      if (alertSemAptTxt) alertSemAptTxt.textContent = st.semApt + ' OM(s) programadas aguardando registro do supervisor';
+    } else {
+      alertSemApt.style.display = 'none';
     }
   }
 
@@ -974,11 +1011,12 @@ function renderAL(){
       <div style="display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap">
         <span style="font-size:10px;background:var(--bg3);border:1px solid var(--b2);border-radius:20px;padding:2px 8px;color:var(--tx3)">CMS: ${c.status||'–'}</span>
         ${atrasada?'<span class="atraso-badge">⚠️ ATRASADA</span>':''}
+        ${(()=>{const sc=(c.status||'').toLowerCase();const prog=sc.includes('programada')||sc===''||sc==='programadas';return prog&&!apt&&estaAtrasada(c.om)?'<span style="display:inline-flex;align-items:center;gap:4px;background:var(--ye-bg);border:1px solid rgba(245,158,11,.4);color:var(--ye);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700">📋 SEM APONTAMENTO</span>':''})()}
         ${apt&&apt.motivo?`<span style="font-size:10px;background:var(--ye-bg);border:1px solid rgba(245,158,11,.3);border-radius:20px;padding:2px 8px;color:var(--ye)">⚠️ ${(apt.motivo_outro||apt.motivo).substring(0,20)}</span>`:''}
       </div>
       <div class="aq">
-        <button class="qb qbg" onclick="event.stopPropagation();qApt('${c.om}','cumpriu')">✅ Cumpriu</button>
         <button class="qb qbr" onclick="event.stopPropagation();abrirApt('${c.om}','nao_cumpriu')">❌ Não Cumpriu</button>
+        <button class="qb qby" style="background:var(--ye-bg);color:var(--ye);border:1px solid rgba(245,158,11,.3)" onclick="event.stopPropagation();abrirApt('${c.om}','atraso')">⚠️ Atraso</button>
         <button class="qb qbb" onclick="event.stopPropagation();openDet('${c.om}')">📝 Detalhe</button>
       </div>
     </div>`;
@@ -996,19 +1034,36 @@ function renderInd(){
 
   const st = statsForSem(semInd);
   const totalReal=st.realizadas;
+  // Hh realizadas = soma de todas as OMs que foram realizadas (Fechadas + Apontamentos Concluídos + supervisor cumpriu/atraso)
+  const hhRealInd = getCMSSem(semInd).reduce((acc,o)=>{
+    if(foiRealizada(o.om,semInd)) return acc+(+o.hhr||0);
+    return acc;
+  },0);
+
+  // Cumpridas no prazo = CMS Fechadas/Concluídas + supervisor cumpriu
+  const totalCumpridas = st.cmsFech + st.cmsConc + st.pz;
+  // Executadas com atraso = só supervisor marcou atraso (as do CMS já estão no cmsFech/cmsConc)
+  const totalAtraso = st.at;
+  // Não cumpridas = só supervisor marcou não cumpriu
+  const totalNaoCumpriu = st.nc;
+  // Base para % = total de OMs da semana
+  const baseInd = st.tot;
+
   const inds=[
-    {l:'Realizadas na Semana',v:st.tot>0?Math.round((totalReal/st.tot)*100):0,u:'%',c:'var(--gr)'},
-    {l:'Cumpridas no Prazo (Sup.)',v:st.totalProg>0?Math.round((st.pz/st.totalProg)*100):0,u:'%',c:'var(--gr)'},
-    {l:'Executadas com Atraso',v:st.totalProg>0?Math.round((st.at/st.totalProg)*100):0,u:'%',c:'var(--ye)'},
-    {l:'Não Cumpridas',v:st.totalProg>0?Math.round((st.nc/st.totalProg)*100):0,u:'%',c:'var(--re)'},
+    {l:'Realizadas na Semana',v:baseInd>0?Math.round((st.realizadas/baseInd)*100):0,u:'%',c:'var(--gr)'},
+    {l:'Cumpridas (CMS + Supervisor)',v:baseInd>0?Math.round((totalCumpridas/baseInd)*100):0,u:'%',c:'var(--gr)'},
     {l:'Fechadas pelo CMS',v:st.cmsFech,u:'OMs',c:'var(--purple,#8b5cf6)'},
     {l:'Apontamentos Concluídos CMS',v:st.cmsConc,u:'OMs',c:'var(--ac)'},
+    {l:'Cumpridas pelo Supervisor',v:st.pz,u:'OMs',c:'var(--gr)'},
+    {l:'Executadas com Atraso (Sup.)',v:totalAtraso,u:'OMs',c:'var(--ye)'},
+    {l:'Não Cumpridas (Sup.)',v:totalNaoCumpriu,u:'OMs',c:'var(--re)'},
     {l:'Reprogramações',v:st.rp,u:'OMs',c:'var(--bl)'},
     {l:'Backlog em Aberto',v:st.pd,u:'OMs',c:'var(--re)'},
+    {l:'Programadas sem Apontamento',v:st.semApt||0,u:'OMs',c:st.semApt>0?'var(--ye)':'var(--gr)'},
     {l:'Desvio do Plano (Realizado vs Esperado)',v:(st.esp-st.real)<=0?0:Math.abs(st.esp-st.real),u:'%',c:(st.esp-st.real)<=0?'var(--gr)':(st.esp-st.real)<=15?'var(--ye)':'var(--re)'},
     {l:'Apontamentos do Supervisor',v:DB.apts.filter(a=>a.semana===semInd).length,u:'reg.',c:'var(--ac)'},
     {l:'Hh Previstas na Semana',v:Math.round(getCMSSem(semInd).reduce((a,o)=>a+(+o.hhp||0),0)),u:'h',c:'var(--tx2)'},
-    {l:'Hh Realizadas (CMS)',v:getCMSSem(semInd).reduce((a,o)=>a+(+o.hhr||0),0).toFixed(1),u:'h',c:'var(--gr)'},
+    {l:'Hh Realizadas (realizadas)',v:hhRealInd.toFixed(1),u:'h',c:'var(--gr)'},
     {l:'Eficiência Hh',v:(()=>{const p=getCMSSem(semInd).reduce((a,o)=>a+(+o.hhp||0),0);const r=getCMSSem(semInd).reduce((a,o)=>a+(+o.hhr||0),0);return p>0?Math.round((r/p)*100):0;})(),u:'%',c:'var(--ac)'},
   ];
 
@@ -1278,7 +1333,18 @@ function statsForSem(sem){
   const real=tot>0?Math.round((realizadas/tot)*100):0;
   const esp=espPct();
   const tend=esp>=100 ? real : (esp>0?Math.min(100,Math.round((real/esp)*100)):0);
-  return{tot,pz,at,nc,rp,an,pd,real,esp,tend,cmsExec,cmsFech,cmsConc,totalProg,realizadas};
+  // OMs vencidas SEM apontamento do supervisor
+  const semApt = cms.filter(c=>{
+    const sc=(c.status||'').toLowerCase();
+    const prog=sc.includes('programada')||sc===''||sc==='programadas';
+    if(!prog) return false;
+    if(foiRealizada(c.om,sem)) return false;
+    const apt = ultAptSem(c.om,sem);
+    if(apt) return false; // já tem apontamento
+    return estaAtrasada(c.om,sem); // só se estiver vencida
+  }).length;
+
+  return{tot,pz,at,nc,rp,an,pd,real,esp,tend,cmsExec,cmsFech,cmsConc,totalProg,realizadas,semApt};
 }
 
 function motivosSem(sem){
