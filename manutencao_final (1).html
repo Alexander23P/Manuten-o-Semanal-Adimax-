@@ -148,6 +148,16 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .em-s{font-size:12px}
 .wc{background:var(--card);border:1px solid var(--b);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
 .wc.on{border-color:var(--ac);background:var(--card2)}
+/* ATRASO PISCANDO */
+@keyframes pulse-red{0%,100%{border-color:var(--re);box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{border-color:rgba(239,68,68,.5);box-shadow:0 0 0 4px rgba(239,68,68,.0)}}
+.ac.atrasada{animation:pulse-red 1.8s infinite;border-left-color:var(--re)!important}
+/* BADGE ATRASO */
+.atraso-badge{display:inline-flex;align-items:center;gap:4px;background:var(--re-bg);border:1px solid rgba(239,68,68,.4);color:var(--re);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700}
+/* CARD ALERTA */
+.alert-card{background:var(--re-bg);border:1px solid rgba(239,68,68,.3);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.alert-card .an{font-size:24px;font-weight:800;color:var(--re)}
+.alert-card .at2{font-size:12px;color:var(--re)}
+.alert-card .as{font-size:11px;color:var(--tx3);margin-top:2px}
 /* CONFIG MODAL */
 .cfg-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .cfg-row label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em}
@@ -174,43 +184,63 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     <div class="sc on" id="sc-dash">
       <div class="p">
         <div class="card">
-          <div class="st">⚡ Projeção de Conclusão da Semana</div>
-          <div class="gw">
-            <svg class="gs" viewBox="0 0 190 105">
-              <defs>
-                <linearGradient id="gg"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient>
-                <linearGradient id="gy"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#d97706"/></linearGradient>
-                <linearGradient id="gr2"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/></linearGradient>
-              </defs>
-              <path d="M15 95 A80 80 0 0 1 175 95" fill="none" stroke="#1a2d4a" stroke-width="13" stroke-linecap="round"/>
-              <path id="garc" d="M15 95 A80 80 0 0 1 175 95" fill="none" stroke="url(#gr2)" stroke-width="13" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251"/>
-              <text x="13" y="103" fill="#ef4444" font-size="9" font-family="monospace">0</text>
-              <text x="90" y="22" fill="#f59e0b" font-size="9" font-family="monospace" text-anchor="middle">80</text>
-              <text x="168" y="103" fill="#22c55e" font-size="9" font-family="monospace" text-anchor="end">100</text>
-              <line id="gneedle" x1="95" y1="95" x2="95" y2="23" stroke="white" stroke-width="2.5" stroke-linecap="round" transform="rotate(-90 95 95)"/>
-              <circle cx="95" cy="95" r="5" fill="white"/>
-            </svg>
-            <div class="gv" id="gval">–%</div>
-            <div class="gl">Índice de Tendência Semanal</div>
-            <div class="gp gr" id="gpill">⏳ Aguardando dados</div>
+          <div class="st">📊 Cumprimento da Programação Semanal</div>
+
+          <!-- % ACUMULADO GRANDE -->
+          <div style="text-align:center;padding:10px 0 6px">
+            <div id="cum-pct" style="font-size:52px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;color:var(--gr)">–%</div>
+            <div id="cum-sub" style="font-size:12px;color:var(--tx3);margin-top:4px">– de – OMs realizadas</div>
+            <div id="cum-pill" style="display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-top:8px;background:var(--gr-bg);color:var(--gr)">⏳ Aguardando</div>
           </div>
+
+          <!-- BARRAS POR DIA -->
+          <div style="margin-top:14px">
+            <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Cumprimento por Dia</div>
+            <div id="cum-dias" style="display:flex;gap:6px;align-items:flex-end;height:90px;justify-content:space-around"></div>
+            <div id="cum-dias-labels" style="display:flex;gap:6px;justify-content:space-around;margin-top:6px"></div>
+          </div>
+
+          <!-- BARRA ACUMULADA -->
           <div style="margin-top:12px">
-            <div class="pr"><span class="pl">Esperado</span><div class="pt"><div class="pb" id="pb-esp" style="background:var(--tx3);width:0%"></div></div><span class="pv" id="pv-esp">0%</span></div>
-            <div class="pr"><span class="pl">Realizado</span><div class="pt"><div class="pb" id="pb-real" style="background:var(--gr);width:0%"></div></div><span class="pv" id="pv-real">0%</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-bottom:4px">
+              <span>Acumulado</span>
+              <span id="cum-acc-lbl">0%</span>
+            </div>
+            <div style="background:var(--bg3);border-radius:6px;height:10px;overflow:hidden">
+              <div id="cum-acc-bar" style="height:100%;border-radius:6px;background:var(--gr);width:0%;transition:width .6s"></div>
+            </div>
           </div>
         </div>
-        <div class="sg2 g">
-          <div class="sc2 ca"><div class="sn" id="d-tot">0</div><div class="sl">Total Prog.</div></div>
-          <div class="sc2 cg"><div class="sn" id="d-pz">0</div><div class="sl">No Prazo</div></div>
+        <!-- ALERTA DE ATRASO -->
+        <div id="alert-atraso" style="display:none;margin-top:10px">
+          <div class="alert-card" onclick="goSc('op',document.querySelector('.bi[data-s=op]'));setTimeout(()=>{document.querySelector('.fc[data-f=atrasada]')?.click()},100)">
+            <div>⚠️</div>
+            <div>
+              <div class="at2">OMs em Atraso!</div>
+              <div class="as" id="alert-atraso-txt">OMs programadas com data vencida</div>
+            </div>
+            <div style="margin-left:auto"><div class="an" id="alert-atraso-n">0</div><div style="font-size:9px;color:var(--re)">OMs</div></div>
+          </div>
+        </div>
+
+        <div class="sg3 g">
+          <div class="sc2 ca"><div class="sn" id="d-tot">0</div><div class="sl">Total Semana</div></div>
+          <div class="sc2 cg"><div class="sn" id="d-exec">0</div><div class="sl">Realizadas</div></div>
+          <div class="sc2 cgr"><div class="sn" id="d-pd">0</div><div class="sl">Pendentes</div></div>
         </div>
         <div class="sg3 g" style="margin-top:8px">
-          <div class="sc2 cy"><div class="sn" id="d-at">0</div><div class="sl">Atraso</div></div>
+          <div class="sc2 cg"><div class="sn" id="d-pz">0</div><div class="sl">Cumpriu Prazo</div></div>
+          <div class="sc2 cy"><div class="sn" id="d-at">0</div><div class="sl">Com Atraso</div></div>
           <div class="sc2 cr"><div class="sn" id="d-nc">0</div><div class="sl">Não Cumpriu</div></div>
-          <div class="sc2 cb"><div class="sn" id="d-rp">0</div><div class="sl">Reprog.</div></div>
+        </div>
+        <div class="sg3 g" style="margin-top:8px">
+          <div class="sc2 cb"><div class="sn" id="d-rp">0</div><div class="sl">Reprogramadas</div></div>
+          <div class="sc2" id="d-dv-card"><div class="sn" id="d-dv">–</div><div class="sl" id="d-dv-lbl">Desvio</div></div>
+          <div class="sc2"><div class="sn" style="color:var(--tx2)" id="d-hhp">0h</div><div class="sl">Hh Previsto</div></div>
         </div>
         <div class="sg2 g" style="margin-top:8px">
-          <div class="sc2 cgr"><div class="sn" id="d-pd">0</div><div class="sl">Pendentes</div></div>
-          <div class="sc2"><div class="sn" style="color:var(--tx2)" id="d-dv">–</div><div class="sl">Desvio</div></div>
+          <div class="sc2 cg"><div class="sn" id="d-hhr">0h</div><div class="sl">Hh Real</div></div>
+          <div class="sc2"><div class="sn" style="color:var(--ac)" id="d-hhef">0%</div><div class="sl">Eficiência Hh</div></div>
         </div>
         <div class="card g"><div class="st">📊 Programado × Cumprido por Dia</div><div class="cb2"><canvas id="ch-day"></canvas></div></div>
         <div class="card g"><div class="st">📍 Cumprimento por Área</div><div id="area-b"></div></div>
@@ -222,23 +252,38 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     <div class="sc" id="sc-op">
       <div class="ws" id="wstrip"></div>
       <div class="fb" id="fbar">
-        <div class="fc on" data-f="todos" onclick="setF(this)">Todos</div>
-        <div class="fc" data-f="pendente" onclick="setF(this)">Pendentes</div>
-        <div class="fc" data-f="cumpriu" onclick="setF(this)">Cumpridas</div>
-        <div class="fc" data-f="nao_cumpriu" onclick="setF(this)">Não Cumpridas</div>
-        <div class="fc" data-f="atraso" onclick="setF(this)">Com Atraso</div>
-        <div class="fc" data-f="reprogramada" onclick="setF(this)">Reprog.</div>
+        <div class="fc on" data-f="todos" onclick="setF(this)">🔴 Pendentes</div>
+        <div class="fc" data-f="atrasada" onclick="setF(this)">⚠️ Em Atraso</div>
+        <div class="fc" data-f="todos_ver" onclick="setF(this)">Ver Todas</div>
+        <div class="fc" data-f="cumpriu" onclick="setF(this)">✅ Cumpridas</div>
+        <div class="fc" data-f="nao_cumpriu" onclick="setF(this)">❌ Não Cumpridas</div>
+        <div class="fc" data-f="atraso" onclick="setF(this)">⏱ C/ Atraso</div>
+        <div class="fc" data-f="reprogramada" onclick="setF(this)">📅 Reprog.</div>
       </div>
       <div id="alist" class="al"></div>
     </div>
 
     <!-- INDICADORES -->
     <div class="sc" id="sc-ind">
-      <div class="p">
+      <div class="p" style="padding-bottom:0">
+        <!-- SELETOR DE SEMANA -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:600;color:var(--tx2)">Análise por Semana</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onclick="navSemInd(-1)" style="background:var(--card);border:1px solid var(--b2);color:var(--tx2);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:16px">‹</button>
+            <div id="ind-sem-label" style="font-size:13px;font-weight:700;color:var(--tx);min-width:80px;text-align:center">Semana –</div>
+            <button onclick="navSemInd(+1)" style="background:var(--card);border:1px solid var(--b2);color:var(--tx2);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:16px">›</button>
+          </div>
+        </div>
+        <!-- RESUMO RÁPIDO DA SEMANA -->
+        <div id="ind-resumo" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px"></div>
+      </div>
+      <div class="p" style="padding-top:0">
         <div class="card"><div class="st">📈 Indicadores</div><div id="ind-l"></div></div>
         <div class="card g"><div class="st">👤 Por Manutentor</div><div id="mnt-b"></div></div>
         <div class="card g"><div class="st">🥧 Distribuição de Motivos</div><div class="cb2 tall"><canvas id="ch-mot"></canvas></div></div>
         <div class="card g"><div class="st">📉 Evolução Diária</div><div class="cb2"><canvas id="ch-ev"></canvas></div></div>
+        <div class="card g" id="hh-analise"></div>
       </div>
     </div>
 
@@ -343,24 +388,45 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     <div class="mt">Semanas</div>
     <div id="sem-l"></div>
 
-    <!-- PDF IMPORT -->
+    <!-- LINK CMS -->
     <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--b)">
-      <div class="st" style="margin-bottom:6px">📄 Importar PDF do CMS</div>
-      <div style="font-size:11px;color:var(--tx3);margin-bottom:10px;line-height:1.5">A IA extrai automaticamente todas as OMs do PDF e atualiza o app e a planilha.</div>
-      <div class="fi"><label>Identificador da Semana</label><input type="text" id="pdf-sem-id" placeholder="ex: 22, 23…"></div>
-      <div id="pdf-drop" style="border:2px dashed var(--b2);border-radius:10px;padding:20px;text-align:center;cursor:pointer" onclick="document.getElementById('pdf-inp').click()">
-        <div style="font-size:2rem;margin-bottom:6px">📄</div>
-        <div style="font-size:13px;font-weight:600;color:var(--tx2)" id="pdf-drop-txt">Selecionar PDF do CMS</div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:3px">Toque para escolher o arquivo</div>
-        <input type="file" id="pdf-inp" accept="application/pdf,.pdf" style="display:none" onchange="importPDF(this)">
+      <div class="st" style="margin-bottom:6px">🔗 Carregar via Link do CMS</div>
+      <div style="font-size:11px;color:var(--tx3);margin-bottom:10px;line-height:1.6">
+        1. Abra o relatório semanal no CMS<br>
+        2. Copie o link da barra do navegador<br>
+        3. Cole abaixo e toque em Carregar
       </div>
-      <div id="pdf-prog-wrap" style="display:none;margin-top:10px">
-        <div style="background:var(--bg3);border-radius:20px;height:6px;overflow:hidden;margin-bottom:6px">
-          <div id="pdf-prog-bar" style="height:100%;border-radius:20px;background:var(--ac);width:0%;transition:width .4s"></div>
+      <div class="fi">
+        <label>Link do Relatório CMS</label>
+        <textarea id="link-cms" rows="3"
+          style="width:100%;background:var(--bg3);border:1.5px solid var(--b2);border-radius:8px;color:var(--tx);font-size:11px;padding:10px 12px;font-family:monospace;outline:none;resize:none"
+          placeholder="https://m-v4-attachments.s3.amazonaws.com/adimax/..."
+          oninput="iniciarContador()"></textarea>
+      </div>
+
+      <!-- CONTADOR REGRESSIVO -->
+      <div id="link-timer-wrap" style="display:none;margin-bottom:12px">
+        <div style="background:var(--re-bg);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+          <div style="font-size:1.6rem" id="link-timer-ico">⏱</div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:700;color:var(--re)">Link expira em <span id="link-timer-n">120</span>s!</div>
+            <div style="font-size:10px;color:var(--tx3);margin-top:2px">Toque em Carregar agora antes que expire</div>
+          </div>
+          <div style="font-size:28px;font-weight:800;color:var(--re);font-variant-numeric:tabular-nums;min-width:44px;text-align:center" id="link-timer-big">120</div>
         </div>
-        <div id="pdf-prog-txt" style="font-size:11px;color:var(--tx2);text-align:center"></div>
+        <div style="background:var(--bg3);border-radius:4px;height:4px;overflow:hidden;margin-top:6px">
+          <div id="link-timer-bar" style="height:100%;background:var(--re);width:100%;transition:width 1s linear"></div>
+        </div>
       </div>
-      <div id="pdf-msg" style="font-size:12px;text-align:center;min-height:16px;margin-top:8px"></div>
+
+      <div id="link-prog" style="display:none;margin-bottom:10px">
+        <div style="background:var(--bg3);border-radius:20px;height:6px;overflow:hidden;margin-bottom:6px">
+          <div id="link-prog-bar" style="height:100%;border-radius:20px;background:var(--ac);width:0%;transition:width .4s"></div>
+        </div>
+        <div id="link-prog-txt" style="font-size:11px;color:var(--tx2);text-align:center"></div>
+      </div>
+      <button class="btn bta" onclick="carregarLinkCMS()" style="margin-bottom:8px">🔗 Carregar dados do CMS</button>
+      <div id="link-msg" style="font-size:12px;text-align:center;min-height:16px;margin-top:4px"></div>
     </div>
 
     <!-- JSON BACKUP -->
@@ -388,7 +454,7 @@ let API = localStorage.getItem(K.url) || '';
 
 // ═══ STATE ═══
 let DB={cms:[],apts:[],semanas:[]};
-let S={semana:null,dia:null,filt:'todos',status:null};
+let S={semana:null,dia:null,filt:'todos',status:null,indSem:null};
 let curOM=null,CH={};
 
 function load(){
@@ -436,37 +502,58 @@ async function sync(){
   }
   setSY('spin','Sincronizando…');
   try{
-    const res=await fetch(API+'?action=getProgramacao&t='+Date.now()).then(r=>r.json());
-    if(res.error)throw new Error(res.error);
-    if(!res.rows||!res.rows.length)throw new Error('Nenhuma OM encontrada. Verifique o Apps Script.');
+    // 1. Buscar OMs da planilha (abas OMs_SXX criadas pelo JSON)
+    const res = await fetch(API+'?action=getProgramacao&t='+Date.now()).then(r=>r.json());
+    if(res.error) throw new Error(res.error);
 
-    const semSet=new Set(res.rows.map(r=>r.semana).filter(Boolean));
-    semSet.forEach(s=>{if(!DB.semanas.includes(s))DB.semanas.push(s);});
+    if(res.rows && res.rows.length){
+      const semSet=new Set(res.rows.map(r=>r.semana).filter(Boolean));
+      semSet.forEach(s=>{if(!DB.semanas.includes(s))DB.semanas.push(s);});
+      // Atualiza OMs existentes mas NÃO remove as que vieram do JSON local
+      res.rows.forEach(row=>{
+        const idx=DB.cms.findIndex(c=>c.om===row.om&&c.semana===row.semana);
+        if(idx>=0) DB.cms[idx]={...DB.cms[idx],...row};
+        else DB.cms.push(row);
+      });
+      if(!S.semana&&DB.semanas.length) S.semana=DB.semanas[DB.semanas.length-1];
+    }
 
-    res.rows.forEach(row=>{
-      const idx=DB.cms.findIndex(c=>c.om===row.om&&c.semana===row.semana);
-      if(idx>=0)DB.cms[idx]={...DB.cms[idx],...row};
-      else DB.cms.push(row);
-    });
-
-    if(!S.semana&&DB.semanas.length)S.semana=DB.semanas[DB.semanas.length-1];
-
-    // sync apontamentos
+    // 2. Buscar apontamentos da planilha (sincroniza entre supervisores)
     if(S.semana){
       try{
         const ar=await fetch(API+'?action=getApontamentos&semana='+encodeURIComponent(S.semana)+'&t='+Date.now()).then(r=>r.json());
-        if(ar.apontamentos)ar.apontamentos.forEach(a=>{if(a.id&&!DB.apts.find(x=>x.id===a.id))DB.apts.push(a);});
+        if(ar.apontamentos) ar.apontamentos.forEach(a=>{
+          if(a.id&&!DB.apts.find(x=>x.id===a.id)) DB.apts.push(a);
+        });
       }catch(e){}
     }
 
-    save();setSY('ok','Atualizado ✓');
-    toast('✅ '+res.total+' OMs carregadas — Semanas: '+DB.semanas.join(', '));
+    save(); setSY('ok','Atualizado ✓');
+    toast('✅ '+(res.total||DB.cms.length)+' OMs · Apontamentos sincronizados');
     renderAll();
   }catch(e){
     setSY('err','Erro');
     toast('❌ '+e.message);
     console.error(e);
   }
+}
+
+
+// Sincroniza só apontamentos do Sheets (leve, sem recarregar OMs)
+async function syncApts() {
+  if (!API || !S.semana) return;
+  try {
+    const ar = await fetch(API+'?action=getApontamentos&semana='+encodeURIComponent(S.semana)+'&t='+Date.now()).then(r=>r.json());
+    if (ar.apontamentos && ar.apontamentos.length) {
+      let novos = 0;
+      ar.apontamentos.forEach(a => {
+        if (a.id && !DB.apts.find(x=>x.id===a.id)) {
+          DB.apts.push(a); novos++;
+        }
+      });
+      if (novos > 0) { save(); renderAll(); }
+    }
+  } catch(e) { console.warn('syncApts:', e.message); }
 }
 
 async function envApt(apt){
@@ -510,37 +597,205 @@ function parseBR(s){
 function getDias(){
   const set=new Set();getCMS().forEach(c=>{if(c.inicio)set.add(c.inicio);});
   const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  return[...set].sort((a,b)=>(parseBR(a)||0)-(parseBR(b)||0)).map(d=>{const dt=parseBR(d);return{date:d,name:dt?DAYS[dt.getDay()]:'?',num:dt?dt.getDate():'?'};});
+  return[...set].sort((a,b)=>(parseBR(a)||0)-(parseBR(b)||0)).map(d=>{const dt=parseBR(d);return{date:d,name:dt?DAYS[dt.getDay()]:'?',num:dt?dt.getDate():'?',dow:dt?dt.getDay():1};});
 }
-function espPct(){const m={0:100,1:20,2:40,3:60,4:80,5:100,6:100};return m[new Date().getDay()]??100;}
+function espPct(){
+  // Semana começa na Segunda (1=Seg=20%, 2=Ter=40%, 3=Qua=60%, 4=Qui=80%, 5=Sex=100%)
+  // Sábado e Domingo = 100% (semana encerrada)
+  const m={0:100,1:20,2:40,3:60,4:80,5:100,6:100};
+  return m[new Date().getDay()]??100;
+}
 function stats(){
-  const cms=getCMS(),tot=cms.length;
+  const cms=getCMS();
+  const tot=cms.length;
+
+  // Concluídas pelo CMS (Fechadas + Apontamentos concluídos)
+  let cmsFech=0,cmsConc=0;
+  cms.forEach(c=>{
+    const sc=(c.status||'').toLowerCase();
+    if(sc==='fechadas'||sc==='fechada') cmsFech++;
+    else if(sc.includes('apontamento')) cmsConc++;
+  });
+  const cmsExec=cmsFech+cmsConc; // já executadas pelo CMS
+
+  // Apontamentos do supervisor (sobre as Programadas)
   let pz=0,at=0,nc=0,rp=0,an=0;
-  cms.forEach(c=>{const s=sit(c.om);if(s==='cumpriu')pz++;else if(s==='atraso')at++;else if(s==='nao_cumpriu')nc++;else if(s==='reprogramada')rp++;else if(s==='andamento')an++;});
-  const pd=Math.max(0,tot-pz-at-nc-rp-an),real=tot>0?Math.round(((pz+at)/tot)*100):0,esp=espPct(),tend=esp>0?Math.round((real/esp)*100):0;
-  return{tot,pz,at,nc,rp,an,pd,real,esp,tend};
+  cms.forEach(c=>{
+    const sc=(c.status||'').toLowerCase();
+    const programada=sc.includes('programada')||sc===''||sc==='programadas';
+    if(!programada) return; // ignora as já concluídas no CMS
+    const s=sit(c.om);
+    if(s==='cumpriu')pz++;
+    else if(s==='atraso')at++;
+    else if(s==='nao_cumpriu')nc++;
+    else if(s==='reprogramada')rp++;
+    else if(s==='andamento')an++;
+  });
+
+  // Pendentes = Programadas sem apontamento
+  const totalProg=cms.filter(c=>{
+    const sc=(c.status||'').toLowerCase();
+    return sc.includes('programada')||sc===''||sc==='programadas';
+  }).length;
+  const pd=Math.max(0,totalProg-pz-at-nc-rp-an);
+
+  // Realizadas = CMS concluídas + supervisor cumpriu/atraso
+  const realizadas=cmsExec+pz+at;
+  const real=tot>0?Math.round((realizadas/tot)*100):0;
+  const esp=espPct();
+  // Tendência: se esperado >= 100% (semana encerrada), tendência = real
+  // Durante a semana: (real/esp)*100, limitado a 100
+  const tend=esp>=100 ? real : (esp>0?Math.min(100,Math.round((real/esp)*100)):0);
+
+  return{tot,pz,at,nc,rp,an,pd,real,esp,tend,cmsExec,cmsFech,cmsConc,totalProg,realizadas};
 }
 function motivos(){const c={};DB.apts.filter(a=>a.semana===S.semana&&(a.motivo||a.motivo_outro)).forEach(a=>{const m=a.motivo_outro||a.motivo||'';if(m)c[m]=(c[m]||0)+1;});return Object.entries(c).sort((a,b)=>b[1]-a[1]);}
-function byArea(){const a={};getCMS().forEach(c=>{const k=((c.local2||c.local1||c.area||'Sem área').split('–').pop().trim()||'Sem área').substring(0,22);if(!a[k])a[k]={t:0,c:0};a[k].t++;const s=sit(c.om);if(s==='cumpriu'||s==='atraso')a[k].c++;});return Object.entries(a).sort((a,b)=>b[1].t-a[1].t).slice(0,8);}
-function byManut(){const m={};getCMS().forEach(c=>{const r=(c.responsavel||'N/A').split(' ').slice(0,2).join(' ');if(!m[r])m[r]={t:0,c:0};m[r].t++;const s=sit(c.om);if(s==='cumpriu'||s==='atraso')m[r].c++;});return Object.entries(m).sort((a,b)=>b[1].t-a[1].t).slice(0,10);}
+
+// Verifica se OM está atrasada (data de início anterior a hoje e ainda pendente)
+function estaAtrasada(om, semana) {
+  const cms = DB.cms.find(c => c.om === om && c.semana === (semana || S.semana));
+  if (!cms) return false;
+  // se já foi realizada não está atrasada
+  if (foiRealizada(om, semana)) return false;
+  // se tem apontamento do supervisor também não
+  const apt = semana ? ultAptSem(om, semana) : ultApt(om);
+  if (apt) return false;
+  // verificar se a data de início é anterior a hoje
+  if (!cms.inicio) return false;
+  const dtInicio = parseBR(cms.inicio);
+  if (!dtInicio) return false;
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+  dtInicio.setHours(0,0,0,0);
+  return dtInicio < hoje;
+}
+
+// Verifica se OM foi realizada considerando CMS + supervisor
+function foiRealizada(om, semana) {
+  const cms = DB.cms.find(c => c.om === om && c.semana === (semana || S.semana));
+  if (cms) {
+    const sc = (cms.status || '').toLowerCase();
+    if (sc === 'fechadas' || sc === 'fechada' || sc.includes('apontamento')) return true;
+  }
+  const s = semana ? sitSem(om, semana) : sit(om);
+  return s === 'cumpriu' || s === 'atraso';
+}
+
+function byArea(){
+  const a={};
+  getCMS().forEach(c=>{
+    const k=((c.local2||c.local1||c.area||'Sem área').split('–').pop().trim()||'Sem área').substring(0,22);
+    if(!a[k])a[k]={t:0,c:0};
+    a[k].t++;
+    if(foiRealizada(c.om)) a[k].c++;
+  });
+  return Object.entries(a).sort((a,b)=>b[1].t-a[1].t).slice(0,8);
+}
+function byManut(){
+  const m={};
+  getCMS().forEach(c=>{
+    const r=(c.responsavel||'N/A').replace(/^\d+-\s*/,'').split(' ').slice(0,2).join(' ');
+    if(!m[r])m[r]={t:0,c:0};
+    m[r].t++;
+    if(foiRealizada(c.om)) m[r].c++;
+  });
+  return Object.entries(m).sort((a,b)=>b[1].t-a[1].t).slice(0,10);
+}
 function bars(items,color){
   if(!items.length)return'<div style="color:var(--tx3);font-size:12px;text-align:center;padding:.75rem">Sem dados</div>';
-  return items.map(([n,d])=>{const t=typeof d==='object'?d.t:d,cv=typeof d==='object'?d.c:d,p=t>0?Math.round((cv/t)*100):0;return`<div class="pr"><span class="pl" style="font-size:10px;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${n}">${n}</span><div class="pt"><div class="pb" style="background:${color};width:${p}%"></div></div><span class="pv">${p}%</span></div>`;}).join('');
+  return items.map(([n,d])=>{
+    const t=typeof d==='object'?d.t:d;
+    const cv=typeof d==='object'?d.c:d;
+    const p=t>0?Math.round((cv/t)*100):0;
+    const cor=p>=90?'var(--gr)':p>=70?'var(--ye)':'var(--re)';
+    return`<div class="pr" style="margin-bottom:9px">
+      <span class="pl" style="font-size:10px;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${n}">${n}</span>
+      <div class="pt"><div class="pb" style="background:${cor};width:${p}%"></div></div>
+      <span class="pv" style="color:${cor}">${p}%</span>
+    </div>
+    <div style="font-size:9px;color:var(--tx3);text-align:right;margin-top:-7px;margin-bottom:4px;padding-right:2px">${cv} de ${t} OMs</div>`;
+  }).join('');
 }
 
 // ═══ RENDER ═══
 function renderAll(){
-  document.getElementById('tb-sub').textContent='Semana '+(S.semana||'–')+' · '+getCMS().length+' atividades';
+    const stTop=stats();
+  document.getElementById('tb-sub').textContent='Semana '+(S.semana||'–')+' · '+stTop.pd+' pendentes · '+Math.round((stTop.realizadas/Math.max(stTop.tot,1))*100)+'% realizado';
   renderDash();renderOp();renderInd();renderHist();
 }
 
 function renderDash(){
   const st=stats();
-  ['tot','pz','at','nc','rp','pd'].forEach((k,i)=>document.getElementById('d-'+k).textContent=[st.tot,st.pz,st.at,st.nc,st.rp,st.pd][i]);
-  document.getElementById('d-dv').textContent=(st.esp-st.real)+'pp';
-  gauge(st.tend);
-  document.getElementById('pb-esp').style.width=st.esp+'%';document.getElementById('pv-esp').textContent=st.esp+'%';
-  document.getElementById('pb-real').style.width=st.real+'%';document.getElementById('pv-real').textContent=st.real+'%';
+  document.getElementById('d-tot').textContent=st.tot;
+  document.getElementById('d-exec').textContent=st.realizadas;
+  document.getElementById('d-pd').textContent=st.pd;
+  document.getElementById('d-pz').textContent=st.pz;
+  document.getElementById('d-at').textContent=st.at;
+  document.getElementById('d-nc').textContent=st.nc;
+  document.getElementById('d-rp').textContent=st.rp;
+  // Desvio com cor e label explicativo
+  const desvioVal = st.esp - st.real;
+  const dvEl = document.getElementById('d-dv');
+  const dvCard = document.getElementById('d-dv-card');
+  const dvLbl = document.getElementById('d-dv-lbl');
+  if(dvEl){
+    // sem dados — mostrar neutro
+    if(st.tot === 0){
+      dvEl.textContent = '–';
+      dvEl.style.fontSize = '24px';
+      dvEl.style.color = 'var(--tx3)';
+      if(dvCard) dvCard.style.borderColor = 'var(--b)';
+      if(dvLbl) dvLbl.textContent = 'Sem dados';
+    } else if(desvioVal <= 0){
+      dvEl.textContent = '✓ No Ritmo';
+      dvEl.style.fontSize = '14px';
+      dvEl.style.color = 'var(--gr)';
+      if(dvCard) dvCard.style.borderColor = 'var(--gr)';
+      if(dvLbl) dvLbl.textContent = 'Dentro do Plano';
+    } else if(desvioVal <= 15){
+      dvEl.textContent = '-'+desvioVal+'%';
+      dvEl.style.fontSize = '24px';
+      dvEl.style.color = 'var(--ye)';
+      if(dvCard) dvCard.style.borderColor = 'var(--ye)';
+      if(dvLbl) dvLbl.textContent = 'Abaixo do Plano';
+    } else {
+      dvEl.textContent = '-'+desvioVal+'%';
+      dvEl.style.fontSize = '24px';
+      dvEl.style.color = 'var(--re)';
+      if(dvCard) dvCard.style.borderColor = 'var(--re)';
+      if(dvLbl) dvLbl.textContent = 'Abaixo do Plano';
+    }
+  }
+  // Hh total no dashboard
+  const hhpDash=getCMS().reduce((a,o)=>a+(+o.hhp||0),0);
+  const hhrDash=getCMS().reduce((a,o)=>a+(+o.hhr||0),0);
+  renderCumprimento(st);
+  // barras de progresso removidas (substituídas por renderCumprimento)
+  // Alerta de OMs atrasadas
+  const atrasadas = getCMS().filter(c=>estaAtrasada(c.om));
+  const alertEl = document.getElementById('alert-atraso');
+  const alertN  = document.getElementById('alert-atraso-n');
+  const alertTxt = document.getElementById('alert-atraso-txt');
+  if (alertEl) {
+    if (atrasadas.length > 0) {
+      alertEl.style.display = 'block';
+      if (alertN) alertN.textContent = atrasadas.length;
+      if (alertTxt) alertTxt.textContent = atrasadas.length + ' OM(s) com data de programação vencida';
+    } else {
+      alertEl.style.display = 'none';
+    }
+  }
+
+  // Preencher Hh no dashboard
+  const hhpD=getCMS().reduce((a,o)=>a+(+o.hhp||0),0);
+  const hhrD=getCMS().reduce((a,o)=>a+(+o.hhr||0),0);
+  const hhefD=hhpD>0?Math.round((hhrD/hhpD)*100):0;
+  const dHhp=document.getElementById('d-hhp');
+  const dHhr=document.getElementById('d-hhr');
+  const dHhef=document.getElementById('d-hhef');
+  if(dHhp)dHhp.textContent=Math.round(hhpD)+'h';
+  if(dHhr)dHhr.textContent=hhrD.toFixed(1)+'h';
+  if(dHhef)dHhef.textContent=hhefD+'%';
   chartDay();
   document.getElementById('area-b').innerHTML=bars(byArea(),'var(--gr)');
   const m=motivos();const el=document.getElementById('mot-r');
@@ -549,22 +804,116 @@ function renderDash(){
   el.innerHTML=m.map(([n,v],i)=>`<div class="pr"><span class="pl" style="font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${n}">${i+1}. ${n}</span><div class="pt"><div class="pb" style="background:var(--re);width:${Math.round((v/max)*100)}%"></div></div><span class="pv">${v}x</span></div>`).join('');
 }
 
-function gauge(v){
-  v=Math.min(100,Math.max(0,v||0));
-  document.getElementById('gval').textContent=v+'%';
-  const arc=document.getElementById('garc');
-  arc.style.strokeDashoffset=251-(v/100)*251;
-  arc.setAttribute('stroke',v>=95?'url(#gg)':v>=80?'url(#gy)':'url(#gr2)');
-  document.getElementById('gneedle').setAttribute('transform',`rotate(${-90+(v/100)*180} 95 95)`);
-  const p=document.getElementById('gpill');
-  if(v>=95){p.className='gp gg';p.textContent='🟢 NO RITMO';}
-  else if(v>=80){p.className='gp gy';p.textContent='🟡 ATENÇÃO';}
-  else{p.className='gp gr';p.textContent='🔴 DESVIO';}
+function gauge(v, real, esp){
+  // mantido vazio — substituído por renderCumprimento()
+}
+
+function renderCumprimento(st) {
+  const dias = getDias();
+  const cms  = getCMS();
+  const tot  = st.tot;
+  const real = st.realizadas;
+  const pct  = tot > 0 ? Math.round((real / tot) * 100) : 0;
+
+  // % grande
+  const pctEl = document.getElementById('cum-pct');
+  const subEl = document.getElementById('cum-sub');
+  const pill  = document.getElementById('cum-pill');
+  const accBar = document.getElementById('cum-acc-bar');
+  const accLbl = document.getElementById('cum-acc-lbl');
+
+  if (pctEl) {
+    pctEl.textContent = tot === 0 ? '–%' : pct + '%';
+    pctEl.style.color = tot === 0 ? 'var(--tx3)' : pct >= 90 ? 'var(--gr)' : pct >= 70 ? 'var(--ye)' : 'var(--re)';
+  }
+  if (subEl) subEl.textContent = tot === 0 ? 'Nenhuma OM carregada' : real + ' de ' + tot + ' OMs realizadas · ' + st.pd + ' pendentes';
+  if (accBar) accBar.style.width = pct + '%';
+  if (accBar) accBar.style.background = pct >= 90 ? 'var(--gr)' : pct >= 70 ? 'var(--ye)' : 'var(--re)';
+  if (accLbl) accLbl.textContent = pct + '%';
+
+  if (pill) {
+    if (tot === 0) {
+      pill.style.background='var(--gy-bg)'; pill.style.color='var(--gy)'; pill.textContent='⏳ Aguardando dados';
+    } else if (pct >= 90) {
+      pill.style.background='var(--gr-bg)'; pill.style.color='var(--gr)'; pill.textContent='🟢 DENTRO DO PLANO';
+    } else if (pct >= 70) {
+      pill.style.background='var(--ye-bg)'; pill.style.color='var(--ye)'; pill.textContent='🟡 ATENÇÃO';
+    } else {
+      pill.style.background='var(--re-bg)'; pill.style.color='var(--re)'; pill.textContent='🔴 ABAIXO DO PLANO';
+    }
+  }
+
+  // Barras por dia
+  const diasEl  = document.getElementById('cum-dias');
+  const labsEl  = document.getElementById('cum-dias-labels');
+  if (!diasEl || !labsEl) return;
+
+  diasEl.innerHTML  = '';
+  labsEl.innerHTML  = '';
+
+  if (!dias.length) return;
+
+  // calcular cumprimento por dia
+  const porDia = dias.map(d => {
+    const atv = cms.filter(c => c.inicio === d.date);
+    const totD = atv.length;
+    // realizadas: CMS concluídas + apontamentos cumpriu/atraso do supervisor
+    const realD = atv.filter(c => {
+      const sc = (c.status || '').toLowerCase();
+      if (sc === 'fechadas' || sc === 'fechada' || sc.includes('apontamento')) return true;
+      const s = sit(c.om);
+      return s === 'cumpriu' || s === 'atraso';
+    }).length;
+    const pctD = totD > 0 ? Math.round((realD / totD) * 100) : 0;
+    return { ...d, totD, realD, pctD };
+  });
+
+  const maxH = 70; // altura máxima das barras em px
+  const today = fmtD(new Date());
+
+  porDia.forEach(d => {
+    const cor = d.pctD >= 90 ? 'var(--gr)' : d.pctD >= 70 ? 'var(--ye)' : d.pctD > 0 ? 'var(--re)' : 'var(--bg3)';
+    const isHoje = d.date === today;
+    const h = Math.max(4, Math.round((d.pctD / 100) * maxH));
+
+    // coluna da barra
+    const col = document.createElement('div');
+    col.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;justify-content:flex-end;height:' + maxH + 'px';
+
+    // % acima da barra
+    const pctLbl = document.createElement('div');
+    pctLbl.style.cssText = 'font-size:10px;font-weight:700;color:' + (d.totD > 0 ? cor : 'var(--tx3)') + ';font-variant-numeric:tabular-nums';
+    pctLbl.textContent = d.totD > 0 ? d.pctD + '%' : '–';
+
+    // barra
+    const bar = document.createElement('div');
+    bar.style.cssText = `width:100%;height:${h}px;border-radius:4px 4px 0 0;background:${cor};transition:height .5s;${isHoje ? 'box-shadow:0 0 8px ' + cor : ''}`;
+
+    // qtd abaixo
+    const qtd = document.createElement('div');
+    qtd.style.cssText = 'font-size:9px;color:var(--tx3);margin-top:2px';
+    qtd.textContent = d.totD > 0 ? d.realD + '/' + d.totD : '';
+
+    col.appendChild(pctLbl);
+    col.appendChild(bar);
+    diasEl.appendChild(col);
+
+    // label do dia
+    const lbl = document.createElement('div');
+    lbl.style.cssText = `flex:1;text-align:center;font-size:10px;font-weight:${isHoje ? '700' : '500'};color:${isHoje ? 'var(--ac)' : 'var(--tx3)'}`;
+    lbl.innerHTML = `<div>${d.name}</div><div style="font-size:9px">${d.num}</div><div style="font-size:9px;color:var(--tx3)">${d.totD > 0 ? d.realD+'/'+d.totD : ''}</div>`;
+    labsEl.appendChild(lbl);
+  });
 }
 
 function chartDay(){
   const dias=getDias(),labels=dias.map(d=>d.name+' '+d.num),pg=[],cp=[];
-  dias.forEach(d=>{const a=getCMS().filter(c=>c.inicio===d.date);pg.push(a.length);cp.push(a.filter(c=>{const s=sit(c.om);return s==='cumpriu'||s==='atraso';}).length);});
+  dias.forEach(d=>{
+    const a=getCMS().filter(c=>c.inicio===d.date);
+    pg.push(a.length);
+    // conta realizadas: CMS concluídas + apontamentos cumpriu/atraso
+    cp.push(a.filter(c=>foiRealizada(c.om)).length);
+  });
   const ctx=document.getElementById('ch-day').getContext('2d');
   if(CH.day)CH.day.destroy();
   CH.day=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Programado',data:pg,backgroundColor:'rgba(79,142,247,.35)',borderColor:'#4f8ef7',borderWidth:1,borderRadius:4},{label:'Cumprido',data:cp,backgroundColor:'rgba(34,197,94,.55)',borderColor:'#22c55e',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8aa4c8',font:{size:10}}}},scales:{x:{ticks:{color:'#8aa4c8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8aa4c8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}}}});
@@ -573,7 +922,13 @@ function chartDay(){
 function renderOp(){renderWS();renderAL();}
 function renderWS(){
   const dias=getDias();
-  if(!S.dia&&dias.length){const today=fmtD(new Date());S.dia=dias.find(d=>d.date===today)?.date||dias[0].date;}
+  if(!S.dia&&dias.length){
+    const today=fmtD(new Date());
+    // tenta achar hoje, senão pega a segunda-feira (primeiro dia útil)
+    const found=dias.find(d=>d.date===today);
+    const seg=dias.find(d=>d.dow===1); // segunda-feira
+    S.dia=found?.date||seg?.date||dias[0].date;
+  }
   const cms=getCMS();
   document.getElementById('wstrip').innerHTML=dias.map(d=>{const has=cms.some(c=>c.inicio===d.date);return`<div class="dc ${d.date===S.dia?'on':''} ${has?'has':''}" onclick="selD('${d.date}')"><span class="dn">${d.name}</span><span class="dd">${d.num}</span><span class="dot"></span></div>`;}).join('');
 }
@@ -582,19 +937,45 @@ function setF(el){document.querySelectorAll('#fbar .fc').forEach(c=>c.classList.
 function renderAL(){
   let cms=getCMS();
   if(S.dia)cms=cms.filter(c=>c.inicio===S.dia);
-  if(S.filt!=='todos'){if(S.filt==='pendente')cms=cms.filter(c=>{const s=sit(c.om);return s==='pendente'||s==='andamento';});else cms=cms.filter(c=>sit(c.om)===S.filt);}
+
+  // Filtro principal
+  if(S.filt==='todos'){
+    // Padrão: só Programadas sem apontamento do supervisor
+    cms=cms.filter(c=>{
+      const sc=(c.status||'').toLowerCase();
+      const programada=sc.includes('programada')||sc===''||sc==='programadas';
+      return programada && !ultApt(c.om);
+    });
+  } else if(S.filt==='atrasada'){
+    cms=cms.filter(c=>estaAtrasada(c.om));
+  } else if(S.filt==='todos_ver'){
+    // mostra todas
+  } else if(S.filt==='pendente'){
+    cms=cms.filter(c=>{const s=sit(c.om);return s==='pendente'||s==='andamento';});
+  } else {
+    cms=cms.filter(c=>sit(c.om)===S.filt);
+  }
   const el=document.getElementById('alist');
   if(!cms.length){
-    el.innerHTML=`<div class="em"><span class="em-i">${DB.cms.length?'📋':'🔌'}</span><div class="em-t">${DB.cms.length?'Nenhuma atividade':'Sem dados'}</div><div class="em-s">${DB.cms.length?'Ajuste o filtro ou selecione outro dia':'Configure a URL do Apps Script (ícone ⚙️) e sincronize'}</div></div>`;
+    const msgVazia = DB.cms.length
+      ? (S.filt==='todos' ? '🎉 Tudo em dia!<br><span style="font-size:11px;color:var(--tx3)">Não há OMs pendentes neste dia.<br>Use "Ver Todas" para visualizar o histórico.</span>' : 'Nenhuma atividade com este filtro')
+      : 'Configure a URL do Apps Script (ícone ⚙️) e sincronize';
+    el.innerHTML=`<div class="em"><span class="em-i">${DB.cms.length?(S.filt==='todos'?'🎉':'📋'):'🔌'}</span><div class="em-t" style="font-size:14px">${msgVazia}</div></div>`;
     return;
   }
   el.innerHTML=cms.map(c=>{
     const s=sit(c.om),cl=SC[s],lbl=SL[s];
     const apt=ultApt(c.om);
     const area=((c.local2||c.local1||c.area||'').split('–').pop()||'').trim().substring(0,20)||'–';
-    return`<div class="ac ${ACL[cl]}" onclick="openDet('${c.om}')">
+    const atrasada = estaAtrasada(c.om);
+    return`<div class="ac ${ACL[cl]}${atrasada?' atrasada':''}" onclick="openDet('${c.om}')">
       <div class="at"><div style="flex:1;min-width:0"><div class="ao">OM ${c.om}</div><div class="ad">${c.descricao||'–'}</div></div><span class="ab ${BCL[cl]}">${lbl}</span></div>
-      <div class="am"><span>📍 ${area}</span><span>👤 ${(c.responsavel||'–').replace(/^\d+-\s*/,'').split(' ')[0]}</span>${c.tipo?`<span>🔧 ${c.tipo.substring(0,15)}</span>`:''}${apt&&apt.motivo?`<span style="color:var(--ye)">⚠️ ${(apt.motivo_outro||apt.motivo).substring(0,18)}</span>`:''}</div>
+      <div class="am"><span>📍 ${area}</span><span>👤 ${(c.responsavel||'–').replace(/^\d+-\s*/,'').split(' ')[0]}</span>${c.tipo?`<span>🔧 ${c.tipo.substring(0,15)}</span>`:''}</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap">
+        <span style="font-size:10px;background:var(--bg3);border:1px solid var(--b2);border-radius:20px;padding:2px 8px;color:var(--tx3)">CMS: ${c.status||'–'}</span>
+        ${atrasada?'<span class="atraso-badge">⚠️ ATRASADA</span>':''}
+        ${apt&&apt.motivo?`<span style="font-size:10px;background:var(--ye-bg);border:1px solid rgba(245,158,11,.3);border-radius:20px;padding:2px 8px;color:var(--ye)">⚠️ ${(apt.motivo_outro||apt.motivo).substring(0,20)}</span>`:''}
+      </div>
       <div class="aq">
         <button class="qb qbg" onclick="event.stopPropagation();qApt('${c.om}','cumpriu')">✅ Cumpriu</button>
         <button class="qb qbr" onclick="event.stopPropagation();abrirApt('${c.om}','nao_cumpriu')">❌ Não Cumpriu</button>
@@ -605,19 +986,94 @@ function renderAL(){
 }
 
 function renderInd(){
-  const st=stats();
-  const inds=[{l:'Cumprimento no Prazo',v:st.tot>0?Math.round((st.pz/st.tot)*100):0,u:'%',c:'var(--gr)'},{l:'Executadas com Atraso',v:st.tot>0?Math.round((st.at/st.tot)*100):0,u:'%',c:'var(--ye)'},{l:'Não Cumpridas',v:st.tot>0?Math.round((st.nc/st.tot)*100):0,u:'%',c:'var(--re)'},{l:'Reprogramações',v:st.rp,u:'OMs',c:'var(--bl)'},{l:'Backlog Gerado',v:st.nc+st.rp,u:'OMs',c:'var(--re)'},{l:'Desvio do Plano',v:Math.abs(st.esp-st.real),u:'pp',c:'var(--ye)'},{l:'Apontamentos Registrados',v:DB.apts.filter(a=>a.semana===S.semana).length,u:'reg.',c:'var(--ac)'}];
+  // usa semana dos indicadores (pode ser diferente da semana ativa)
+  if(!S.indSem) S.indSem = S.semana;
+  const semInd = S.indSem || S.semana;
+
+  // label
+  const lbl = document.getElementById('ind-sem-label');
+  if(lbl) lbl.textContent = 'Semana ' + (semInd||'–');
+
+  const st = statsForSem(semInd);
+  const totalReal=st.realizadas;
+  const inds=[
+    {l:'Realizadas na Semana',v:st.tot>0?Math.round((totalReal/st.tot)*100):0,u:'%',c:'var(--gr)'},
+    {l:'Cumpridas no Prazo (Sup.)',v:st.totalProg>0?Math.round((st.pz/st.totalProg)*100):0,u:'%',c:'var(--gr)'},
+    {l:'Executadas com Atraso',v:st.totalProg>0?Math.round((st.at/st.totalProg)*100):0,u:'%',c:'var(--ye)'},
+    {l:'Não Cumpridas',v:st.totalProg>0?Math.round((st.nc/st.totalProg)*100):0,u:'%',c:'var(--re)'},
+    {l:'Fechadas pelo CMS',v:st.cmsFech,u:'OMs',c:'var(--purple,#8b5cf6)'},
+    {l:'Apontamentos Concluídos CMS',v:st.cmsConc,u:'OMs',c:'var(--ac)'},
+    {l:'Reprogramações',v:st.rp,u:'OMs',c:'var(--bl)'},
+    {l:'Backlog em Aberto',v:st.pd,u:'OMs',c:'var(--re)'},
+    {l:'Desvio do Plano (Realizado vs Esperado)',v:(st.esp-st.real)<=0?0:Math.abs(st.esp-st.real),u:'%',c:(st.esp-st.real)<=0?'var(--gr)':(st.esp-st.real)<=15?'var(--ye)':'var(--re)'},
+    {l:'Apontamentos do Supervisor',v:DB.apts.filter(a=>a.semana===semInd).length,u:'reg.',c:'var(--ac)'},
+    {l:'Hh Previstas na Semana',v:Math.round(getCMSSem(semInd).reduce((a,o)=>a+(+o.hhp||0),0)),u:'h',c:'var(--tx2)'},
+    {l:'Hh Realizadas (CMS)',v:getCMSSem(semInd).reduce((a,o)=>a+(+o.hhr||0),0).toFixed(1),u:'h',c:'var(--gr)'},
+    {l:'Eficiência Hh',v:(()=>{const p=getCMSSem(semInd).reduce((a,o)=>a+(+o.hhp||0),0);const r=getCMSSem(semInd).reduce((a,o)=>a+(+o.hhr||0),0);return p>0?Math.round((r/p)*100):0;})(),u:'%',c:'var(--ac)'},
+  ];
+
+  // Análise da diferença de Hh
+  const hhAnalise = (()=>{
+    const cms=getCMSSem(semInd);
+    let hhpConc=0,hhrConc=0,hhpPend=0;
+    cms.forEach(o=>{
+      if(foiRealizada(o.om,semInd)){
+        hhpConc+=(+o.hhp||0);
+        hhrConc+=(+o.hhr||0);
+      } else {
+        hhpPend+=(+o.hhp||0);
+      }
+    });
+    const difEstimativa=hhpConc-hhrConc; // positivo = sobra, negativo = estouro
+    return{hhpConc,hhrConc,hhpPend,difEstimativa};
+  })();
+  // Análise de Horas
+  const hhAnalEl = document.getElementById('hh-analise');
+  if (hhAnalEl) {
+    const corEst = hhAnalise.difEstimativa >= 0 ? 'var(--gr)' : 'var(--re)';
+    const txtEst = hhAnalise.difEstimativa >= 0
+      ? 'Estimativa acima do realizado (sobra de tempo previsto)'
+      : 'Serviços demandaram mais tempo que o previsto';
+    const sinal = hhAnalise.difEstimativa >= 0 ? '+' : '';
+    const icone = hhAnalise.difEstimativa >= 0 ? '✅' : '⚠️';
+    let html = '';
+    html += '<div class="st" style="margin-bottom:10px">⏱ Análise de Horas</div>';
+    html += '<div class="pr"><span class="pl">Concluídas</span><div class="pt"><div class="pb" style="background:var(--gr);width:100%"></div></div><span class="pv" style="color:var(--tx2)">' + hhAnalise.hhpConc.toFixed(1) + 'h</span></div>';
+    html += '<div style="font-size:10px;color:var(--tx3);text-align:right;margin:-4px 0 6px;padding-right:2px">Prev: ' + hhAnalise.hhpConc.toFixed(1) + 'h &nbsp;|&nbsp; Real: ' + hhAnalise.hhrConc.toFixed(1) + 'h &nbsp;|&nbsp; Dif: <span style="color:' + corEst + '">' + sinal + hhAnalise.difEstimativa.toFixed(1) + 'h</span></div>';
+    html += '<div class="pr"><span class="pl">Pendentes</span><div class="pt"><div class="pb" style="background:var(--re);width:100%"></div></div><span class="pv" style="color:var(--re)">' + hhAnalise.hhpPend.toFixed(1) + 'h</span></div>';
+    html += '<div style="font-size:10px;color:var(--tx3);text-align:right;margin:-4px 0 8px;padding-right:2px">Horas não executadas por OMs em aberto</div>';
+    html += '<div style="font-size:11px;color:' + corEst + ';background:var(--bg3);border-radius:8px;padding:8px 10px;border-left:3px solid ' + corEst + '">' + icone + ' ' + txtEst + '</div>';
+    hhAnalEl.innerHTML = html;
+  }
   document.getElementById('ind-l').innerHTML=inds.map(i=>`<div class="ir"><span class="il"><span class="idot" style="background:${i.c}"></span>${i.l}</span><span class="iv" style="color:${i.c}">${i.v}<span class="iu">${i.u}</span></span></div>`).join('');
-  document.getElementById('mnt-b').innerHTML=bars(byManut(),'var(--ac)');
-  const mts=motivos();
+
+  // resumo rápido no topo
+  const resumo = document.getElementById('ind-resumo');
+  if(resumo){
+    const pctReal=st.tot>0?Math.round((st.realizadas/st.tot)*100):0;
+    const corGauge=pctReal>=80?'var(--gr)':pctReal>=60?'var(--ye)':'var(--re)';
+    // Hh previstos e reais da semana
+    const cmsSem=getCMSSem(semInd);
+    const hhpTot=cmsSem.reduce((a,o)=>a+(+o.hhp||0),0);
+    const hhrTot=cmsSem.reduce((a,o)=>a+(+o.hhr||0),0);
+    resumo.innerHTML=`
+      <div class="sc2 ca"><div class="sn">${st.tot}</div><div class="sl">Previstas</div></div>
+      <div class="sc2 cg"><div class="sn">${st.realizadas}</div><div class="sl">Realizadas</div></div>
+      <div class="sc2 cr"><div class="sn">${st.pd}</div><div class="sl">Em Aberto</div></div>
+      <div class="sc2" style="border-color:${corGauge}"><div class="sn" style="color:${corGauge}">${pctReal}%</div><div class="sl">% Realizado</div></div>
+      <div class="sc2"><div class="sn" style="color:var(--tx2)">${Math.round(hhpTot)}h</div><div class="sl">Hh Previsto</div></div>
+      <div class="sc2 cg"><div class="sn">${hhrTot.toFixed(1)}h</div><div class="sl">Hh Real</div></div>`;
+  }
+  document.getElementById('mnt-b').innerHTML=bars(byManutSem(semInd),'var(--ac)');
+  const mts=motivosSem(semInd);
   const ctxM=document.getElementById('ch-mot').getContext('2d');
   if(CH.mot)CH.mot.destroy();
   if(mts.length)CH.mot=new Chart(ctxM,{type:'doughnut',data:{labels:mts.map(m=>m[0]),datasets:[{data:mts.map(m=>m[1]),backgroundColor:['#ef4444','#f59e0b','#3b82f6','#22c55e','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16','#94a3b8'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8aa4c8',font:{size:10},boxWidth:11}}}}});
-  const dias=getDias();let acc=0;const all=getCMS();
-  const evD=dias.map(d=>{acc+=all.filter(c=>c.inicio===d.date&&(sit(c.om)==='cumpriu'||sit(c.om)==='atraso')).length;return all.length>0?Math.round((acc/all.length)*100):0;});
+  const dias=getDiasSem(semInd);let acc=0;const all=getCMSSem(semInd);
+  const evD=dias.map(d=>{acc+=all.filter(c=>c.inicio===d.date&&(sitSem(c.om,semInd)==='cumpriu'||sitSem(c.om,semInd)==='atraso')).length;return all.length>0?Math.round((acc/all.length)*100):0;});
   const ctxE=document.getElementById('ch-ev').getContext('2d');
   if(CH.ev)CH.ev.destroy();
-  CH.ev=new Chart(ctxE,{type:'line',data:{labels:dias.map(d=>d.name+' '+d.num),datasets:[{label:'Realizado %',data:evD,borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.1)',fill:true,tension:.4,pointRadius:4},{label:'Esperado %',data:[20,40,60,80,100].slice(0,dias.length),borderColor:'#64748b',borderDash:[5,5],fill:false,tension:0,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8aa4c8',font:{size:10}}}},scales:{x:{ticks:{color:'#8aa4c8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8aa4c8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},min:0,max:100}}}});
+  CH.ev=new Chart(ctxE,{type:'line',data:{labels:dias.map(d=>d.name+' '+d.num),datasets:[{label:'Realizado %',data:evD,borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.1)',fill:true,tension:.4,pointRadius:4},{label:'Esperado %',data:dias.map(d=>{const m={1:20,2:40,3:60,4:80,5:100,6:100,0:100};return m[d.dow||1]||100;}),borderColor:'#64748b',borderDash:[5,5],fill:false,tension:0,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8aa4c8',font:{size:10}}}},scales:{x:{ticks:{color:'#8aa4c8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#8aa4c8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},min:0,max:100}}}});
 }
 
 function renderHist(){
@@ -628,7 +1084,7 @@ function renderHist(){
   const byOM={};apts.forEach(a=>{if(!byOM[a.numero_om])byOM[a.numero_om]=[];byOM[a.numero_om].push(a);});
   el.innerHTML=Object.entries(byOM).map(([om,list])=>{
     const c=DB.cms.find(x=>x.om===om&&x.semana===S.semana);const s=sit(om);
-    return`<div class="hc"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div class="hom">OM ${om}</div><div class="hd">${c?.descricao||'–'}</div></div><span class="ab ${BCL[SC[s]]}">${SL[s]}</span></div><div style="padding-left:6px">${list.map(a=>`<div class="hl"><div class="hts">${a.ts?new Date(a.ts).toLocaleString('pt-BR'):a.data_apontamento||'–'} · ${a.usuario||'–'}</div><div class="hst" style="color:${a.situacao_dia==='cumpriu'?'var(--gr)':a.situacao_dia==='nao_cumpriu'?'var(--re)':'var(--ye)'}">${SL[a.situacao_dia]||a.situacao_dia}</div><div class="hdt">${a.motivo?`<div>⚠️ ${a.motivo_outro||a.motivo}</div>`:''}${a.observacao?`<div>💬 ${a.observacao}</div>`:''}${a.nova_data_prevista?`<div>📅 Nova data: ${a.nova_data_prevista}</div>`:''}</div></div>`).join('')}</div></div>`;
+    return`<div class="hc"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div><div class="hom">OM ${om}</div><div class="hd">${c?.descricao||'–'}</div></div><span class="ab ${BCL[SC[s]]}">${SL[s]}</span></div><div style="padding-left:6px">${list.map(a=>`<div class="hl"><div class="hts">${a.ts?new Date(a.ts).toLocaleString('pt-BR'):a.data_apontamento||'–'} · ${a.usuario||'–'}</div><div class="hst" style="color:${a.situacao_dia==='cumpriu'?'var(--gr)':a.situacao_dia==='nao_cumpriu'?'var(--re)':'var(--ye)'}">${SL[a.situacao_dia]||a.situacao_dia}</div><div class="hdt">${a.motivo?`<div>⚠️ ${a.motivo_outro||a.motivo}</div>`:''}${a.observacao?`<div>💬 ${a.observacao}</div>`:''}${a.nova_data_prevista?`<div>📅 Nova data: ${fmtNovaDt(a.nova_data_prevista)}</div>`:''}</div></div>`).join('')}</div></div>`;
   }).join('');
 }
 
@@ -687,13 +1143,26 @@ function openDet(om){
   document.getElementById('det-t').innerHTML=`OM ${om} <span class="ab ${BCL[SC[s]]}" style="font-size:12px">${SL[s]}</span>`;
   const resp=(c?.responsavel||'–').replace(/^\d+-\s*/,'');
   const fields=[['Descrição',c?.descricao],['Área',c?.local2||c?.local1],['Local de Manutenção',c?.manut],['Responsável',resp],['Tipo de Serviço',c?.tipo],['Unidade',c?.unidade],['Início Programado',c?.inicio],['Fim Programado',c?.fim],['Entrega Prevista',c?.entrega],['Status CMS',c?.status],['Hh Previsto',c?.hhp?c.hhp+'h':null],['Hh Real',c?.hhr?c.hhr+'h':null],['Hh Programado',c?.hhprog?c.hhprog+'h':null]].filter(f=>f[1]);
-  const hist=apts.length?`<div style="margin-top:12px"><div class="st">Histórico de Apontamentos</div><div style="padding-left:6px;margin-top:8px">${apts.map(a=>`<div class="hl"><div class="hts">${a.ts?new Date(a.ts).toLocaleString('pt-BR'):a.data_apontamento||'–'} · ${a.usuario||'–'}</div><div class="hst" style="color:${a.situacao_dia==='cumpriu'?'var(--gr)':a.situacao_dia==='nao_cumpriu'?'var(--re)':'var(--ye)'}">${SL[a.situacao_dia]||a.situacao_dia}</div><div class="hdt">${a.motivo?`<div>⚠️ ${a.motivo_outro||a.motivo}</div>`:''}${a.observacao?`<div>💬 ${a.observacao}</div>`:''}${a.nova_data_prevista?`<div>📅 Nova data: ${a.nova_data_prevista}</div>`:''}</div></div>`).join('')}</div></div>`:'<div style="color:var(--tx3);font-size:12px;text-align:center;margin-top:12px">Nenhum apontamento registrado</div>';
+  const hist=apts.length?`<div style="margin-top:12px"><div class="st">Histórico de Apontamentos</div><div style="padding-left:6px;margin-top:8px">${apts.map(a=>`<div class="hl"><div class="hts">${a.ts?new Date(a.ts).toLocaleString('pt-BR'):a.data_apontamento||'–'} · ${a.usuario||'–'}</div><div class="hst" style="color:${a.situacao_dia==='cumpriu'?'var(--gr)':a.situacao_dia==='nao_cumpriu'?'var(--re)':'var(--ye)'}">${SL[a.situacao_dia]||a.situacao_dia}</div><div class="hdt">${a.motivo?`<div>⚠️ ${a.motivo_outro||a.motivo}</div>`:''}${a.observacao?`<div>💬 ${a.observacao}</div>`:''}${a.nova_data_prevista?`<div>📅 Nova data: ${fmtNovaDt(a.nova_data_prevista)}</div>`:''}</div></div>`).join('')}</div></div>`:'<div style="color:var(--tx3);font-size:12px;text-align:center;margin-top:12px">Nenhum apontamento registrado</div>';
   document.getElementById('det-b').innerHTML=`<div class="card" style="margin-bottom:0">${fields.map(([k,v])=>`<div class="dr"><span class="dk">${k}</span><span class="dv">${v}</span></div>`).join('')}</div>${hist}`;
   openM('m-det');
 }
 
 function openSem(){
-  document.getElementById('sem-l').innerHTML=DB.semanas.length?DB.semanas.map(s=>`<div class="wc ${s===S.semana?'on':''}" onclick="selSem('${s}')"><div><div style="font-size:14px;font-weight:700">Semana ${s}</div><div style="font-size:11px;color:var(--tx3)">${DB.cms.filter(c=>c.semana===s).length} atividades</div></div>${s===S.semana?'<span class="ab bgb">Ativa</span>':''}</div>`).join(''):'<div style="color:var(--tx3);text-align:center;padding:1rem;font-size:13px">Nenhuma semana carregada</div>';
+  pararContador();
+  document.getElementById('link-cms') && (document.getElementById('link-cms').value='');
+  document.getElementById('link-msg') && (document.getElementById('link-msg').textContent='');
+  document.getElementById('sem-l').innerHTML=DB.semanas.length?DB.semanas.map(s=>`<div class="wc ${s===S.semana?'on':''}">
+        <div onclick="selSem('${s}')" style="flex:1;cursor:pointer">
+          <div style="font-size:14px;font-weight:700">Semana ${s}</div>
+          <div style="font-size:11px;color:var(--tx3)">${DB.cms.filter(c=>c.semana===s).length} atividades · ${DB.apts.filter(a=>a.semana===s).length} apontamentos</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${s===S.semana?'<span class="ab bgb">Ativa</span>':''}
+          <button onclick="apagarApts('${s}')" style="background:var(--ye-bg);border:1px solid rgba(245,158,11,.3);color:var(--ye);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">🗑 Apts</button>
+          <button onclick="apagarSemana('${s}')" style="background:var(--re-bg);border:1px solid rgba(239,68,68,.3);color:var(--re);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">🗑 Tudo</button>
+        </div>
+      </div>`).join(''):'<div style="color:var(--tx3);text-align:center;padding:1rem;font-size:13px">Nenhuma semana carregada</div>';
   document.getElementById('imp-msg').textContent='';
   openM('m-sem');
 }
@@ -704,7 +1173,7 @@ function impJSON(input){
   const id=(document.getElementById('imp-id').value||'').trim();
   if(!id){toast('⚠️ Informe o identificador da semana');return;}
   const r=new FileReader();
-  r.onload=e=>{
+  r.onload=async e=>{
     try{
       const d=JSON.parse(e.target.result);if(!Array.isArray(d))throw new Error('Formato inválido');
       d.forEach(item=>{
@@ -716,7 +1185,26 @@ function impJSON(input){
       if(!DB.semanas.includes(id))DB.semanas.push(id);
       S.semana=id;S.dia=null;save();renderAll();
       document.getElementById('imp-msg').textContent='✅ '+d.length+' OMs importadas';
-      setTimeout(()=>closeM('m-sem'),1400);
+      // Enviar OMs para o Google Sheets (banco de dados)
+      if(API){
+        document.getElementById('imp-msg').textContent='✅ '+d.length+' OMs carregadas · Salvando na planilha…';
+        try{
+          const resp = await fetch(API, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ action:'salvarOMs', rows: DB.cms.filter(c=>c.semana===id), semana: id })
+          });
+          const result = await resp.json();
+          if(result.success){
+            document.getElementById('imp-msg').textContent='✅ '+d.length+' OMs salvas na planilha! Aba: '+result.aba;
+          } else {
+            document.getElementById('imp-msg').textContent='✅ '+d.length+' OMs carregadas (planilha: '+( result.error||'offline')+')';
+          }
+        }catch(e){
+          document.getElementById('imp-msg').textContent='✅ '+d.length+' OMs carregadas (planilha offline — sincronize depois)';
+        }
+      }
+      setTimeout(()=>closeM('m-sem'),2500);
     }catch(err){document.getElementById('imp-msg').textContent='❌ '+err.message;}
   };
   r.readAsText(file);
@@ -729,13 +1217,268 @@ function goSc(n,btn){
   document.querySelectorAll('.bi').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   document.getElementById('tb-title').textContent=TITLES[n];
-  if(n==='ind')renderInd();if(n==='hist')renderHist();
+  if(n==='ind'){S.indSem=S.indSem||S.semana;renderInd();}
+  // sempre busca apontamentos atualizados ao entrar em qualquer tela
+  if(API && (n==='op'||n==='hist')) syncApts();if(n==='hist')renderHist();
 }
 function openM(id){document.getElementById(id).classList.add('on');}
 function closeM(id){document.getElementById(id).classList.remove('on');}
 document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('on');}));
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3000);}
 
+
+
+
+// ═══ FUNÇÕES POR SEMANA (para indicadores) ═══
+function getCMSSem(sem){ return DB.cms.filter(c=>c.semana===(sem||S.semana)); }
+
+function ultAptSem(om,sem){
+  return DB.apts.filter(a=>a.numero_om===om&&a.semana===(sem||S.semana)).sort((a,b)=>new Date(b.ts||0)-new Date(a.ts||0))[0]||null;
+}
+function sitSem(om,sem){ const a=ultAptSem(om,sem); return a?a.situacao_dia:'pendente'; }
+
+function getDiasSem(sem){
+  const set=new Set();
+  getCMSSem(sem).forEach(c=>{if(c.inicio)set.add(c.inicio);});
+  const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  return [...set].sort((a,b)=>(parseBR(a)||0)-(parseBR(b)||0)).map(d=>{
+    const dt=parseBR(d);
+    return{date:d,name:dt?DAYS[dt.getDay()]:'?',num:dt?dt.getDate():'?',dow:dt?dt.getDay():0};
+  });
+}
+
+function statsForSem(sem){
+  const cms=getCMSSem(sem);
+  const tot=cms.length;
+  let cmsFech=0,cmsConc=0;
+  cms.forEach(c=>{
+    const sc=(c.status||'').toLowerCase();
+    if(sc==='fechadas'||sc==='fechada') cmsFech++;
+    else if(sc.includes('apontamento')) cmsConc++;
+  });
+  const cmsExec=cmsFech+cmsConc;
+  let pz=0,at=0,nc=0,rp=0,an=0;
+  cms.forEach(c=>{
+    const sc=(c.status||'').toLowerCase();
+    const prog=sc.includes('programada')||sc===''||sc==='programadas';
+    if(!prog) return;
+    const s=sitSem(c.om,sem);
+    if(s==='cumpriu')pz++;
+    else if(s==='atraso')at++;
+    else if(s==='nao_cumpriu')nc++;
+    else if(s==='reprogramada')rp++;
+    else if(s==='andamento')an++;
+  });
+  const totalProg=cms.filter(c=>{
+    const sc=(c.status||'').toLowerCase();
+    return sc.includes('programada')||sc===''||sc==='programadas';
+  }).length;
+  const pd=Math.max(0,totalProg-pz-at-nc-rp-an);
+  const realizadas=cmsExec+pz+at;
+  const real=tot>0?Math.round((realizadas/tot)*100):0;
+  const esp=espPct();
+  const tend=esp>=100 ? real : (esp>0?Math.min(100,Math.round((real/esp)*100)):0);
+  return{tot,pz,at,nc,rp,an,pd,real,esp,tend,cmsExec,cmsFech,cmsConc,totalProg,realizadas};
+}
+
+function motivosSem(sem){
+  const counts={};
+  DB.apts.filter(a=>a.semana===sem&&(a.motivo||a.motivo_outro)).forEach(a=>{
+    const m=a.motivo_outro||a.motivo||''; if(m) counts[m]=(counts[m]||0)+1;
+  });
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+}
+
+function byManutSem(sem){
+  const m={};
+  getCMSSem(sem).forEach(c=>{
+    const r=(c.responsavel||'N/A').replace(/^\d+-\s*/,'').split(' ').slice(0,2).join(' ');
+    if(!m[r])m[r]={t:0,c:0};
+    m[r].t++;
+    if(foiRealizada(c.om,sem)) m[r].c++;
+  });
+  return Object.entries(m).sort((a,b)=>b[1].t-a[1].t).slice(0,10);
+}
+
+// Navegar entre semanas nos indicadores
+function navSemInd(dir){
+  const sems=[...DB.semanas].sort();
+  if(!sems.length) return;
+  if(!S.indSem) S.indSem=S.semana||sems[sems.length-1];
+  const idx=sems.indexOf(S.indSem);
+  const newIdx=Math.max(0,Math.min(sems.length-1,idx+dir));
+  S.indSem=sems[newIdx];
+  renderInd();
+}
+
+
+// ═══ CONTADOR REGRESSIVO DO LINK ═══
+let _timerInterval = null;
+let _timerTotal = 120;
+
+function iniciarContador() {
+  const url = (document.getElementById('link-cms')?.value||'').trim();
+  const wrap = document.getElementById('link-timer-wrap');
+  if (!wrap) return;
+
+  // Limpar timer anterior
+  if (_timerInterval) { clearInterval(_timerInterval); _timerInterval = null; }
+
+  if (!url) { wrap.style.display = 'none'; return; }
+
+  // Extrair tempo de expiração do link AWS (X-Amz-Expires)
+  const match = url.match(/X-Amz-Expires=(\d+)/i);
+  _timerTotal = match ? parseInt(match[1]) : 120;
+
+  let restante = _timerTotal;
+  wrap.style.display = 'block';
+
+  const nEl  = document.getElementById('link-timer-n');
+  const bigEl= document.getElementById('link-timer-big');
+  const barEl= document.getElementById('link-timer-bar');
+  const icoEl= document.getElementById('link-timer-ico');
+
+  const atualizar = () => {
+    if (nEl)   nEl.textContent  = restante;
+    if (bigEl) bigEl.textContent = restante;
+    if (barEl) barEl.style.width = Math.round((restante / _timerTotal) * 100) + '%';
+
+    if (restante <= 30) {
+      // Vermelho pulsando nos últimos 30s
+      if (bigEl) bigEl.style.color = 'var(--re)';
+      if (icoEl) icoEl.textContent = restante % 2 === 0 ? '⏱' : '🔴';
+    } else if (restante <= 60) {
+      if (bigEl) bigEl.style.color = 'var(--ye)';
+      if (barEl) barEl.style.background = 'var(--ye)';
+    }
+
+    if (restante <= 0) {
+      clearInterval(_timerInterval);
+      _timerInterval = null;
+      if (wrap) {
+        wrap.style.background = 'var(--re-bg)';
+        wrap.innerHTML = '<div style="padding:10px 14px;text-align:center"><div style="font-size:1.4rem;margin-bottom:4px">❌</div><div style="font-size:13px;font-weight:700;color:var(--re)">Link expirado!</div><div style="font-size:11px;color:var(--tx3);margin-top:2px">Volte ao CMS e copie um novo link</div></div>';
+      }
+      document.getElementById('link-msg').textContent = '';
+    }
+    restante--;
+  };
+
+  atualizar();
+  _timerInterval = setInterval(atualizar, 1000);
+}
+
+function pararContador() {
+  if (_timerInterval) { clearInterval(_timerInterval); _timerInterval = null; }
+  const wrap = document.getElementById('link-timer-wrap');
+  if (wrap) wrap.style.display = 'none';
+}
+
+// ═══ CARREGAR VIA LINK DO CMS ═══
+async function carregarLinkCMS() {
+  const url = (document.getElementById('link-cms')?.value||'').trim();
+  if (!url) { toast('⚠️ Cole o link do CMS'); return; }
+  if (!API)  { toast('⚠️ Configure a URL do Apps Script (⚙️)'); return; }
+
+  const setMsg = (msg, cor) => {
+    const el = document.getElementById('link-msg');
+    if (el) { el.textContent = msg; el.style.color = cor||'var(--tx2)'; }
+  };
+  const setProg = (pct, txt) => {
+    const w = document.getElementById('link-prog');
+    const b = document.getElementById('link-prog-bar');
+    const t = document.getElementById('link-prog-txt');
+    if (w) w.style.display = pct > 0 ? 'block' : 'none';
+    if (b) b.style.width = pct + '%';
+    if (t) t.textContent = txt;
+  };
+
+  setMsg(''); setProg(20, 'Enviando link para o Apps Script…');
+
+  try {
+    // Chamar Apps Script via GET passando a URL
+    // Usar encodeURIComponent para URLs longas
+    const apiUrl = API + '?action=carregarLink&url=' + encodeURIComponent(url) + '&t=' + Date.now();
+
+    setProg(40, 'Apps Script buscando dados do CMS…');
+    const res = await fetch(apiUrl).then(r => r.json());
+
+    if (res.error) throw new Error(res.error);
+    if (!res.rows || !res.rows.length) throw new Error('Nenhuma OM encontrada no link.');
+
+    setProg(70, 'Salvando ' + res.total + ' OMs…');
+
+    // Atualizar base local
+    const semana = String(res.semana || '');
+    if (semana && !DB.semanas.includes(semana)) DB.semanas.push(semana);
+
+    res.rows.forEach(row => {
+      const idx = DB.cms.findIndex(c => c.om === row.om && c.semana === row.semana);
+      if (idx >= 0) DB.cms[idx] = { ...DB.cms[idx], ...row };
+      else DB.cms.push(row);
+    });
+
+    if (!S.semana && DB.semanas.length) S.semana = DB.semanas[DB.semanas.length-1];
+    S.semana = semana || S.semana;
+    S.dia = null;
+    save(); renderAll();
+
+    setProg(100, '');
+    setMsg(
+      '✅ ' + res.total + ' OMs carregadas! ' +
+      res.programadas + ' programadas · ' +
+      res.concluidas + ' concluídas · ' +
+      res.fechadas + ' fechadas',
+      'var(--gr)'
+    );
+    toast('✅ Semana ' + semana + ' carregada — ' + res.total + ' OMs!');
+    document.getElementById('link-cms').value = '';
+    pararContador();
+    setTimeout(() => closeM('m-sem'), 2500);
+
+  } catch(e) {
+    setProg(0, '');
+    setMsg('❌ ' + e.message, 'var(--re)');
+    toast('❌ ' + e.message);
+  }
+}
+
+// ═══ FORMATAR NOVA DATA ═══
+function fmtNovaDt(v) {
+  if (!v) return '';
+  // já está em dd/mm/yyyy
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(v)) return v;
+  // formato ISO ou Date string
+  const d = new Date(v);
+  if (!isNaN(d)) return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+  return v;
+}
+
+// ═══ APAGAR APONTAMENTOS DA SEMANA ═══
+function apagarApts(semana) {
+  const count = DB.apts.filter(a => a.semana === semana).length;
+  if (!count) { toast('ℹ️ Nenhum apontamento para apagar'); return; }
+  if (!confirm(`Apagar ${count} apontamento(s) da Semana ${semana}?\nEsta ação não pode ser desfeita.`)) return;
+  DB.apts = DB.apts.filter(a => a.semana !== semana);
+  save(); renderAll(); openSem();
+  toast('🗑 Apontamentos da Semana '+semana+' apagados');
+}
+
+// ═══ APAGAR SEMANA COMPLETA ═══
+function apagarSemana(semana) {
+  const cms = DB.cms.filter(c => c.semana === semana).length;
+  const apts = DB.apts.filter(a => a.semana === semana).length;
+  if (!confirm(`Apagar TUDO da Semana ${semana}?\n• ${cms} atividades\n• ${apts} apontamentos\n\nEsta ação não pode ser desfeita.`)) return;
+  DB.cms  = DB.cms.filter(c => c.semana !== semana);
+  DB.apts = DB.apts.filter(a => a.semana !== semana);
+  DB.semanas = DB.semanas.filter(s => s !== semana);
+  if (S.semana === semana) {
+    S.semana = DB.semanas.length ? DB.semanas[DB.semanas.length-1] : null;
+    S.dia = null;
+  }
+  save(); renderAll(); openSem();
+  toast('🗑 Semana '+semana+' removida completamente');
+}
 
 // ═══ IMPORTAR PDF COM CLAUDE API ═══
 async function importPDF(input) {
@@ -883,12 +1626,20 @@ Retorne apenas o array JSON, nada mais.`;
 }
 
 // ═══ INIT ═══
+// Limpar chaves antigas de versões anteriores
+['ax_cms3','ax_apt3','ax_sem3','ax_cur3','ax_usr3',
+ 'ax_cms4','ax_apt4','ax_sem4','ax_cur4','ax_usr4',
+ 'adimax_manut_v2','ax5_cms','ax5_apt','ax5_sem','ax5_cur',
+ 'ax_cms','ax_apt','ax_sem','ax_cur'].forEach(k=>{
+  try{ localStorage.removeItem(k); }catch(e){}
+});
 load();renderAll();
-// se tem URL configurada, sincroniza automaticamente
-if(API){setTimeout(()=>sync(),500);}
-else{
+if(API){
+  setTimeout(()=>sync(),500);
+  // Auto-sync a cada 5 minutos
+  setInterval(()=>{ if(API) syncApts(); }, 5*60*1000);
+}else{
   setSY('err','Configure URL');
-  // abre config automaticamente na primeira vez
   setTimeout(()=>{
     toast('👆 Configure a URL do Apps Script para começar');
     openCfg();
